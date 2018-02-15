@@ -65,14 +65,6 @@ void MainThread(LPVOID)
 			}
 			Sleep(200);
 		}
-		else if (GetAsyncKeyState(VK_NUMPAD6))
-		{
-
-		}
-		else if (GetAsyncKeyState(VK_NUMPAD7))
-		{
-
-		}
 
 		Sleep(5);
 	}
