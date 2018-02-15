@@ -1,0 +1,115 @@
+#pragma once
+#define CRENDER_ADDR 0x1154430
+#define ENTITYCONTAINER_ADDR 0x1a05338
+#define AIMER_ADDR 0x1a537c4
+#define LOCALCAMERA_ADDR 0x1a53120
+#define FUNC_GetPlayerFromIndex_ADDR 0xcfe80
+#define CGAMELOGIC_ADDR 0x1891830
+
+
+class Crender
+{
+public:
+	char pad_0000[32]; //0x0000
+	D3DMATRIX Projection; //0x0020
+	D3DMATRIX ViewMatrix; //0x0060
+	static Crender *GetInstance()
+	{
+		return *(Crender**)((UINT64)GetModuleHandle(0)+ CRENDER_ADDR);
+	}
+
+};
+
+class Type
+{
+public:
+	char* TypeName; //0x0000
+	char pad_0008[128]; //0x0008
+}; //Size: 0x0088
+
+
+class Bone
+{
+public:
+	char pad_0038[128]; //0x0038
+	D3DVECTOR Coord; //0x0080
+	char pad_008C[120]; //0x008C
+	D3DMATRIX transform; //0x0104
+	char pad_0144[64]; //0x0144
+}; //Size: 0x0184
+
+
+class BaseEntity
+{
+public:
+	char pad_0000[8]; //0x0000
+	class Type* pType; //0x0008
+	char pad_0010[64]; //0x0010
+	int32_t Id; //0x0050
+	char pad_0060[48]; //0x0060
+	char Name[16]; //0x0084
+	char pad_0094[80]; //0x0094
+	float CurrentHealth; //0x00E4
+	float MaxHealth; //0x00E8
+	char pad_00EC[4]; //0x00EC
+	class Bone* pBone; //0x00F0
+};
+
+class CGameLogic
+{
+public:
+	char pad_0x0000[0x18];
+	__int32 localClientNum;
+	BaseEntity* GetPlayerFromIndex(int idx)
+	{
+		typedef __int64(__fastcall *FUNC_GetPlayerFromIndex)(__int64 a1, int a2);
+		static FUNC_GetPlayerFromIndex _Get = (FUNC_GetPlayerFromIndex)((UINT64)GetModuleHandle(0)+FUNC_GetPlayerFromIndex_ADDR);
+		return (BaseEntity*)_Get((__int64)this, idx);
+	}
+	BaseEntity* GetLocalPlayer()
+	{
+		return GetPlayerFromIndex(localClientNum);
+	}
+	static CGameLogic* GetInstance()
+	{
+		return (CGameLogic*)((UINT64)GetModuleHandle(0) + CGAMELOGIC_ADDR);
+	}
+};
+
+class EntityContainer
+{
+public:
+
+	int32_t EntityCount; //0x0000
+	char pad_0004[4]; //0x0004
+	class BaseEntity** BaseEntitysArray;
+	char pad_0010[48]; //0x0010
+	static EntityContainer* GetInstance()
+	{
+		return (EntityContainer*)((UINT64)GetModuleHandle(0) + ENTITYCONTAINER_ADDR);
+	}
+}; //Size: 0x0040
+
+
+
+class Aimer
+{
+public:
+	float Yaw; //0x0000
+	float Pitch; //0x0004
+	char pad_0008[56]; //0x0008
+	static Aimer* GetInstance()
+	{
+		return (Aimer*)((UINT64)GetModuleHandle(0)+AIMER_ADDR);
+	}
+}; //Size: 0x0040
+class Camera
+{
+public:
+	char pad_0000[48]; //0x0000
+	D3DVECTOR CamPos; //0x0030
+	static Camera* GetInstance()
+	{
+		return (Camera*)((UINT64)GetModuleHandle(0)+LOCALCAMERA_ADDR);
+	}
+}; //Size: 0x044C
